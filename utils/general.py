@@ -465,7 +465,7 @@ def check_imshow(warn=False):
             LOGGER.warning(f'WARNING ⚠️ Environment does not support cv2.imshow() or PIL Image.show()\n{e}')
         return False
 
-
+# 检查后缀名
 def check_suffix(file='yolov5s.pt', suffix=('.pt',), msg=''):
     # Check file(s) for acceptable suffix
     if file and suffix:
@@ -486,6 +486,7 @@ def check_file(file, suffix=''):
     # Search/download file (if necessary) and return path
     check_suffix(file, suffix)  # optional
     file = str(file)  # convert to str()
+    # 如果是绝对路径，就直接返回
     if os.path.isfile(file) or not file:  # exists
         return file
     elif file.startswith(('http:/', 'https:/')):  # download
@@ -503,6 +504,7 @@ def check_file(file, suffix=''):
         return file
     else:  # search
         files = []
+        # 如果不是绝对路径，就在以下三个文件夹中寻找，并生成可读取的绝对路径，例如：'/home/hzq/yolov5/data/coco_traffic.yaml'
         for d in 'data', 'models', 'utils':  # search directories
             files.extend(glob.glob(str(ROOT / d / '**' / file), recursive=True))  # find file
         assert len(files), f'File not found: {file}'  # assert file was found

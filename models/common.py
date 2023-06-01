@@ -31,6 +31,7 @@ from utils.general import (LOGGER, ROOT, Profile, check_requirements, check_suff
                            xyxy2xywh, yaml_load)
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import copy_attr, smart_inference_mode
+from torchvision import models
 
 
 def autopad(k, p=None, d=1):  # kernel, padding, dilation
@@ -869,3 +870,39 @@ class Classify(nn.Module):
         if isinstance(x, list):
             x = torch.cat(x, 1)
         return self.linear(self.drop(self.pool(self.conv(x)).flatten(1)))
+
+class MobileNet1(nn.Module):
+    def __init__(self,ignore) -> None:
+        super().__init__()
+        model = models.mobilenet_v3_small(pretrained=True)
+        modules = list(model.children())
+        modules = modules[0][:4]
+        self.model = nn.Sequential(*modules)
+    
+    def forward(self,x):
+        return self.model(x)
+        
+class MobileNet2(nn.Module):
+    # out 48 channel
+    def __init__(self, ignore) -> None:
+        super().__init__()
+        model = models.mobilenet_v3_small(pretrained=True)
+        modules = list(model.children())
+        modules = modules[0][4:9]
+        self.model = nn.Sequential(*modules)
+
+    def forward(self, x):
+        return self.model(x)
+
+class MobileNet3(nn.Module):
+    # out 576 channel
+    def __init__(self, ignore) -> None:
+        super().__init__()
+        model = models.mobilenet_v3_small(pretrained=True)
+        modules = list(model.children())
+        modules = modules[0][9:]
+        self.model = nn.Sequential(*modules)
+    def forward(self, x):
+        return self.model(x)
+
+
